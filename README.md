@@ -1,4 +1,4 @@
-# AWS-Machine-Learning
+# End-to-end Machine Learning Orchestration with Amazon Sagemaker
 Knowledge sharing about implementing end-to-end Machine Learning workflows on AWS Cloud.
 
 Over the past years, Machine Learning has gained a lot in terms of automation. Many efforts were made in order to orchestrate end-to-end Machine Learning workflows across several applications. This repo describes several aspects of this automation. From data acquisition & processing to advanced model deployment techniques, dedicated notebooks will walk you through the bases and best practises to run your ML Workflows on AWS Cloud.
