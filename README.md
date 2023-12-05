@@ -4,7 +4,7 @@ Knowledge sharing about implementing end-to-end Machine Learning workflows on AW
 Over the past years, Machine Learning has gained a lot in terms of automation. Many efforts were made in order to orchestrate end-to-end Machine Learning workflows across several applications. This repo describes several aspects of this automation. From data acquisition & processing to advanced model deployment techniques, dedicated notebooks will walk you through the bases and best practises to run your ML workflows on AWS Cloud.
 
 ## Data Acquisition & Registry
-1. Bias Detection & Feature Importance: https://github.com/Badisj/AWS-Machine-Learning/edit/main/README.md
+1. Bias Detection & Data Explainability with **Sagemaker Clarify**: https://github.com/Badisj/AWS-Machine-Learning/edit/main/README.md
 2. Dataset Registry & Visualization: https://github.com/Badisj/AWS-Machine-Learning/edit/main/README.md
 
 ## Data Processing & Feature Store
