@@ -5,7 +5,7 @@ Over the past years, Machine Learning has gained a lot in terms of automation. M
 
 ## Data Acquisition & Registry
 1. [Bias Detection & Data Explainability using Amazon Sagemaker Clarify](https://github.com/Badisj/AWS-machine-learning-orchestration/blob/main/Data%20Acquisition%20%26%20Registry/BiasDetection_FeatureImportance.ipynb)
-2. [Dataset Registry & Visualization using AWS Glue Catalog & AWS Atena]([https://github.com/Badisj/AWS-Machine-Learning/edit/main/README.md](https://github.com/Badisj/AWS-machine-learning-orchestration/blob/main/Data%20Acquisition%20%26%20Registry/Dataset%20Registry%20%26%20Visualization.ipynb)
+2. [Dataset Registry & Visualization using AWS Glue Catalog & AWS Atena](https://github.com/Badisj/AWS-Machine-Learning/edit/main/README.md](https://github.com/Badisj/AWS-machine-learning-orchestration/blob/main/Data%20Acquisition%20%26%20Registry/Dataset%20Registry%20%26%20Visualization.ipynb)
 
 ## Data Processing & Feature Store
 1. Feature Definitions, Feature Groups and Feature Store: https://github.com/Badisj/AWS-Machine-Learning/edit/main/README.md
