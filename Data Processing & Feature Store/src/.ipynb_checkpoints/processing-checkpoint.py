@@ -185,9 +185,9 @@ def process(args):
         enc = LabelEncoder()
         df[cat] = enc.fit_transform(df[cat])
         
-        # output = open('AWS-machine-learning-orchestration/Data Processing & Feature Store{}/encoders/{}.pkl'.format(output_data, cat), 'wb')
-        # pickle.dump(enc, output)
-        # output.close()
+        output = open('{}/encoders/{}.pkl'.format(output_data, cat), 'wb')
+        pickle.dump(enc, output)
+        output.close()
     
     
     # ========================== Train test split ==========================
@@ -222,46 +222,43 @@ def process(args):
     # ======================== Create Feature Group ========================
     print("Start Feature Group Creation")
     
-    try:
-        feature_group = create_feature_group(feature_group_name=feature_group_name , 
-                                             df_feature_definition=df_train, 
-                                             column_event_time=column_date, 
-                                             column_id=column_id, 
-                                             prefix='')
+    feature_group = create_feature_group(feature_group_name=feature_group_name , 
+                                         df_feature_definition=df_train, 
+                                         column_event_time=column_date, 
+                                         column_id=column_id, 
+                                         prefix='')
 
-        print("Feature Group Created")
-
-
-        #  ========================== Ingest Features ==========================
-        print('Ingesting Features...')
-
-        feature_group.ingest(data_frame=df_train,
-                             max_workers=1,
-                             wait=True)
+    print("Feature Group Created")
 
 
-        feature_group.ingest(data_frame=df_validation,
-                             max_workers=1,
-                             wait=True)
+    #  ========================== Ingest Features ==========================
+    print('Ingesting Features...')
+
+    feature_group.ingest(data_frame=df_train,
+                         max_workers=1,
+                         wait=True)
 
 
-        feature_group.ingest(data_frame=df_test,
-                             max_workers=1,
-                             wait=True)
+    feature_group.ingest(data_frame=df_validation,
+                         max_workers=1,
+                         wait=True)
 
-        offline_store_status = None
-        while offline_store_status != 'Active':
-            try:
-                offline_store_status = feature_group.describe()['OfflineStoreStatus']['Status']
-            except:
-                pass
-            print('Offline store status: {}'.format(offline_store_status))    
-            time.sleep(15)
 
-        print('Features Ingested.')
-        
-    except ResourceInUse:
-        print('Feature Group already exists, passing this step.')
+    feature_group.ingest(data_frame=df_test,
+                         max_workers=1,
+                         wait=True)
+
+    offline_store_status = None
+    while offline_store_status != 'Active':
+        try:
+            offline_store_status = feature_group.describe()['OfflineStoreStatus']['Status']
+        except:
+            pass
+        print('Offline store status: {}'.format(offline_store_status))    
+        time.sleep(15)
+
+    print('Features Ingested.')
+
     
     
     # ========================== Write CSV files ==========================
