@@ -9,7 +9,7 @@ Over the past years, Machine Learning has gained a lot in terms of automation. M
 
 ## Data Processing & Feature Store
 1. Feature Definitions, Feature Groups and Feature Store: https://github.com/Badisj/AWS-Machine-Learning/edit/main/README.md
-1. [Amazon Sagemaker Processing Jobs]([https://github.com/Badisj/AWS-Machine-Learning/edit/main/README.md](https://github.com/Badisj/AWS-machine-learning-orchestration/blob/main/Data%20Processing%20%26%20Feature%20Store/Data%20Processing%20%26%20Feature%20Store.ipynb)
+1. [Amazon Sagemaker Processing Jobs](https://github.com/Badisj/AWS-machine-learning-orchestration/blob/main/Data%20Processing%20%26%20Feature%20Store/Data%20Processing%20%26%20Feature%20Store.ipynb)
 
 ## Model Training & Debugging
 1. Training with custom script: https://github.com/Badisj/AWS-Machine-Learning/edit/main/README.md
