@@ -32,9 +32,13 @@ from pprint import pprint
 def parse_args():
     parser = argparse.ArgumentParser(description='Process')
     
-    # ====================== Model hyperparameters =====================    
+    # ====================== Model hyperparameters =====================
+    parser.add_argument('--churn_month', type=int,
+        default=1
+    )
+    
     parser.add_argument('--n_estimators', type=int,
-        default=100
+        default=5
     )
     
     parser.add_argument('--max_depth', type=int,
@@ -84,114 +88,93 @@ def parse_args():
 
 
 
-
 ########################################################################
 ############################# Data loader ##############################
-def create_list_input_files(path):
-    input_files = glob.glob('{}/*.csv'.format(path))
-    print(input_files)
-    return input_files
-
-
 def load_data(path):
-    input_files = create_list_input_files(path)
-    
+    input_files = glob.glob('{}/*.csv'.format(path))[0]
     print('Importing {}'.format(input_files))
-    for file in input_files:
-        data = pd.read_csv(file, engine='python')
+    data_frame = pd.read_csv(input_files)
     
-    data = data.select_dtypes([int, float])
-    data.drop(columns=data.columns[1], inplace=True)
-    print('Data import complete.')
-    print(data)
+    data_frame = data_frame.select_dtypes([int,float])
+    data_frame.rename(columns = {'churn_mon': 'churn_mon1'}, inplace = True)
+    data_frame.info()
     
-    return data
+    return data_frame
 
 
 
 ########################################################################
 ########################### Models training ############################
-def model_training(df_train, df_val, n_estimators, max_depth, criterion, random_state, model_dir):
+def train_models(df_train, df_val, churn_month, n_estimators, max_depth, criterion, random_state):
     
     # ================== Retrieve features & targets ================
-    print('Retrieving features and targets.')
-    train_label = df_train.columns[0]
+    print('Retrieving features & target: month {}'.format(churn_month))
     
-    X_train = df_train.drop(columns=[train_label]).copy()
-    y_train = df_train[train_label].copy()
-    print('Training data shape:', X_train.shape)
-    print('Training target shape:', y_train.shape)
-
+    train_label = 'churn_mon{}'.format(churn_month)
     
-    X_val = df_val.drop(columns=[train_label]).copy()
-    y_val = df_val[train_label].copy()
-    print('Validation data shape:', X_val.shape)
-    print('Validation target shape:', y_val.shape)
+    X_train = df_train.drop(columns=['churn_mon1', 'churn_mon2'])
+    y_train = df_train[train_label]
+    
+    X_val = df_val.drop(columns=['churn_mon1', 'churn_mon2'])
+    y_val = df_val[train_label]
     
     
     # ================== Instanciate and fit models =================
-    print('Fitting model...')
-    clf = RandomForestClassifier(
-            n_estimators=n_estimators,
-            max_depth=max_depth,
-            criterion=criterion,
-            random_state=random_state
-    )
+    print('Fitting models')
+    clf = RandomForestClassifier(n_estimators=n_estimators,
+                                 max_depth=max_depth,
+                                 criterion=criterion,
+                                 random_state=random_state)
     
     clf.fit(X_train, y_train)
-    print('Model Fitted.')
+    print('Model fitted.')
     
     
     # ================== Compute validation scores =================
-    y_pred = clf.predict(X_val)
-    proba_pred = clf.predict_proba(X_val)[:,1]
+    print('Evaluation: churn prediction month {}'.format(churn_month))
+    pred_churn = clf.predict(X_val)
+    pred_churn_proba = clf.predict_proba(X_val)[:, 1]
     
-    print(y_pred.shape)
-    print(proba_pred.shape)
+    precision = precision_score(y_val, pred_churn)
+    recall = recall_score(y_val, pred_churn)
+    f1 = f1_score(y_val, pred_churn)
     
-    precision = precision_score(y_val, y_pred)
-    recall = recall_score(y_val, y_pred)
-    f1 = f1_score(y_val, y_pred)
-    roc_auc = roc_auc_score(y_val, proba_pred)
-    accuracy = accuracy_score(y_val, y_pred)
-    
-    print('val_precision:', precision)
-    print('val_recall:', recall)
-    print('val_f1score:', f1)
-    print('val_roc_auc:', roc_auc)
-    print('val_accuracy:', accuracy)
+    roc_auc = roc_auc_score(y_val, pred_churn_proba)
+    accuracy = accuracy_score(y_val, pred_churn)
+    print('val_precision: {0:.2f} - val_recall: {1:.2f} - val_f1score: {2:.2f} - val_roc_auc: {3:.2f} - val_accuracy: {4:.2f}%'.format(precision, 
+                                                                                                                                       recall, 
+                                                                                                                                       f1,
+                                                                                                                                       roc_auc,
+                                                                                                                                       100*accuracy))
+    print('Training Complete.')
     
     
     # ========================= Save Models ========================
-    path = os.path.join(model_dir, "churn_random_forest.joblib")
+    path = os.path.join(args.model_dir, "clf_mon{}.joblib".format(churn_month))
     joblib.dump(clf, path)
-    print('Model persisted at ' + model_dir)
+    
+    print('Model persisted at {}' + args.model_dir)
     
     return clf
     
     
-    
-    
-if __name__ == '__main__':
-    
-    # Argument parser
+########################################################################
+################################ Main  #################################    
+if __name__ == "__main__":
     args = parse_args()
+    print('Loaded arguments:')
     print(args)
     
+    data_train = load_data(args.train_data)
+    data_valid = load_data(args.validation_data)
     
-    # Data loading
-    train_data = load_data(args.train_data)
-    validation_data = load_data(args.validation_data)
-    
-    
-    # Model training
-    estimator = model_training(df_train=train_data, 
-                               df_val=validation_data, 
-                               n_estimators=args.n_estimators, 
-                               max_depth=args.max_depth, 
-                               criterion=args.criterion, 
-                               random_state=args.random_state, 
-                               model_dir=args.model_dir)
+    clf_mon1 = train_models(df_train = data_train, 
+                            df_val = data_valid,
+                            churn_month=args.churn_month,
+                            n_estimators = args.n_estimators, 
+                            max_depth = args.max_depth, 
+                            criterion=args.criterion, 
+                            random_state=args.random_state)
     
     
     # Prepare for inference which will be used in deployment
@@ -201,3 +184,5 @@ if __name__ == '__main__':
     os.system("cp inference.py {}".format(inference_path))
     os.system("cp requirements.txt {}".format(inference_path))
     os.system("cp config.json {}".format(inference_path))
+    
+    

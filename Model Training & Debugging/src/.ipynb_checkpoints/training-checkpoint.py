@@ -34,7 +34,7 @@ def parse_args():
     
     # ====================== Model hyperparameters =====================    
     parser.add_argument('--n_estimators', type=int,
-        default=200
+        default=100
     )
     
     parser.add_argument('--max_depth', type=int,
@@ -87,13 +87,24 @@ def parse_args():
 
 ########################################################################
 ############################# Data loader ##############################
+def create_list_input_files(path):
+    input_files = glob.glob('{}/*.csv'.format(path))
+    print(input_files)
+    return input_files
+
+
 def load_data(path):
-    input_files = glob.glob('{}/*.csv'.format(path))[0]
-    print('Importing {}'.format(input_files))
-    data = pd.read_csv(path)
+    input_files = create_list_input_files(path)
     
+    print('Importing {}'.format(input_files))
+    for file in input_files:
+        data = pd.read_csv(file, engine='python')
+    
+    data = data.select_dtypes([int, float])
     data.drop(columns=data.columns[1], inplace=True)
     print('Data import complete.')
+    print(data)
+    
     return data
 
 
@@ -106,20 +117,25 @@ def model_training(df_train, df_val, n_estimators, max_depth, criterion, random_
     print('Retrieving features and targets.')
     train_label = df_train.columns[0]
     
-    X_train = df_train.drop(columns=[train_label])
-    y_train = df_train[train_label]
+    X_train = df_train.drop(columns=[train_label]).copy()
+    y_train = df_train[train_label].copy()
+    print('Training data shape:', X_train.shape)
+    print('Training target shape:', y_train.shape)
+
     
-    X_val = df_val.drop(columns=[train_label])
-    y_train = df_val[train_label]
+    X_val = df_val.drop(columns=[train_label]).copy()
+    y_val = df_val[train_label].copy()
+    print('Validation data shape:', X_val.shape)
+    print('Validation target shape:', y_val.shape)
     
     
     # ================== Instanciate and fit models =================
     print('Fitting model...')
     clf = RandomForestClassifier(
-        n_estimators=n_estimators,
-        max_depth=max_depth,
-        criterion=criterion,
-        random_state=random_state
+            n_estimators=n_estimators,
+            max_depth=max_depth,
+            criterion=criterion,
+            random_state=random_state
     )
     
     clf.fit(X_train, y_train)
@@ -128,7 +144,10 @@ def model_training(df_train, df_val, n_estimators, max_depth, criterion, random_
     
     # ================== Compute validation scores =================
     y_pred = clf.predict(X_val)
-    proba_pred = clf.predict_proba(X_val)
+    proba_pred = clf.predict_proba(X_val)[:,1]
+    
+    print(y_pred.shape)
+    print(proba_pred.shape)
     
     precision = precision_score(y_val, y_pred)
     recall = recall_score(y_val, y_pred)
@@ -136,28 +155,28 @@ def model_training(df_train, df_val, n_estimators, max_depth, criterion, random_
     roc_auc = roc_auc_score(y_val, proba_pred)
     accuracy = accuracy_score(y_val, y_pred)
     
-    print('val_precision: {0:.2f}'.format(precision))
-    print('val_recall: {1:.2f}'.format(recall))
-    print('val_f1score: {2:.2f}'.format(f1))
-    print('val_roc_auc: {3:.2f}'.format(roc_auc))
-    print('val_accuracy: {4:.2f}%'.format(accuracy))
+    print('val_precision:', precision)
+    print('val_recall:', recall)
+    print('val_f1score:', f1)
+    print('val_roc_auc:', roc_auc)
+    print('val_accuracy:', accuracy)
     
     
     # ========================= Save Models ========================
-    path = os.path.join(model_dir, "churn_random_forest.joblib".format(churn_month))
+    path = os.path.join(model_dir, "churn_random_forest.joblib")
     joblib.dump(clf, path)
     print('Model persisted at ' + model_dir)
-    
     
     return clf
     
     
-          
     
-if name == '__main__':
+    
+if __name__ == '__main__':
     
     # Argument parser
     args = parse_args()
+    print(args)
     
     
     # Data loading
