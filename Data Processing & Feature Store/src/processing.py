@@ -269,13 +269,13 @@ def process(args):
     validation_data = '{}/validation'.format(output_data)
     test_data = '{}/test'.format(output_data)
     
-    df_train = pd.concat((df_train['churn_mon1'], df_train.drop(columns = ['churn_mon1'])), axis=1)
+    df_train = pd.concat((df_train['churn_mon1'], df_train.drop(columns = ['churn_mon1', column_id, column_date, 'split_type'])), axis=1)
     df_train.to_csv('{}/{}.csv'.format(train_data, filename_without_extension), index=False, header=False)
     
-    df_validation = pd.concat((df_validation['churn_mon1'], df_validation.drop(columns = ['churn_mon1'])), axis=1)
+    df_validation = pd.concat((df_validation['churn_mon1'], df_validation.drop(columns = ['churn_mon1', column_id, column_date, 'split_type'])), axis=1)
     df_validation.to_csv('{}/{}.csv'.format(validation_data, filename_without_extension), index=False, header=False)
     
-    df_test = pd.concat((df_test['churn_mon1'], df_test.drop(columns = ['churn_mon1'])), axis=1)
+    df_test = pd.concat((df_test['churn_mon1'], df_test.drop(columns = ['churn_mon1', column_id, column_date, 'split_type'])), axis=1)
     df_test.to_csv('{}/{}.csv'.format(test_data, filename_without_extension), index=False, header=False)
         
     
