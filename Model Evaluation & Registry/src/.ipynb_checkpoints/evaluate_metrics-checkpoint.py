@@ -95,9 +95,11 @@ def model_fn(model_dir):
 
 
 def predict_fn(input_data, model):
-    preds = model.predict(input_data)
-    preds_proba = model.predict_proba(input_data)
-    return np.array([preds, preds_proba])
+    preds = pd.Series(model.predict(input_data), name='prediction')
+    preds_proba = pd.DataFrame(model.predict_proba(input_data), columns = ['class0', 'class1'])
+    
+    preds_df = pd.concat((preds, preds_proba), axis=1)
+    return preds_df.values
 
 
 
@@ -144,11 +146,11 @@ def process(args):
     print('Generating predictions')
     test_label = df_test.columns[0]
     
-    X_test = df_test.drop(columns=[test_label]).copy()
+    X_test = df_test.drop(columns=[test_label]).values
     y_true = df_test[test_label].values
     
     Y_pred = predict_fn(X_test, model)
-    y_pred, y_pred_proba = Y_pred[:, 0], Y_pred[:, 1]
+    y_pred, y_pred_proba = Y_pred[:, 0], Y_pred[:, 1:]
     
     print('Predicted Labels and probabilities: {}'.format(Y_pred))
           
@@ -162,7 +164,7 @@ def process(args):
     #### Confusion matrix ####
     cm = confusion_matrix(y_true=y_true, y_pred=y_pred)
           
-    plt.figure(figsize=(16,6))
+    plt.figure(figsize=(20,7))
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2)
    
     sns.heatmap(cm, 
@@ -173,7 +175,7 @@ def process(args):
     
     #### ROC AUC Curve ####
     RocCurveDisplay.from_predictions(y_true=y_true,
-                                     y_pred=y_pred_proba, 
+                                     y_pred=y_pred_proba[:,1], 
                                      ax=ax2)
           
     plt.show()
@@ -192,7 +194,7 @@ def process(args):
                                         output_dict=True)
           
     evaluation_path = '{}/evaluation.json'.format(metrics_path)
-    with open(evaluation_path, 'w'):
+    with open(evaluation_path, 'w') as f:
           f.write(json.dumps(dic_metrics))
       
           
