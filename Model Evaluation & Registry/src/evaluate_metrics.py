@@ -18,7 +18,7 @@ import seaborn as sns
 sns.set_style("whitegrid", {"grid.color": ".6", "grid.linestyle": ":"})
 
 
-from sklearn.metrics import classification_report, accuracy_score
+from sklearn.metrics import classification_report, accuracy_score, f1_score
 from sklearn.metrics import confusion_matrix, RocCurveDisplay
 
 
@@ -160,11 +160,18 @@ def process(args):
     print(classification_report(y_true=y_true, y_pred=y_pred))
     print(accuracy_score(y_true=y_true, y_pred=y_pred))
     
-          
+    
+    accuracy = accuracy_score(y_true=y_true, y_pred=y_pred)        
+    print('Test accuracy: ', accuracy)
+    
+    f1 = f1_score(y_true=y_true, y_pred=y_pred)        
+    print('Test f1: ', f1)
+    
+    
     #### Confusion matrix ####
     cm = confusion_matrix(y_true=y_true, y_pred=y_pred)
           
-    plt.figure(figsize=(20,7))
+    plt.figure(figsize=(30,7))
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2)
    
     sns.heatmap(cm, 
@@ -186,16 +193,29 @@ def process(args):
           
     metrics_path = os.path.join(args.output_data, 'metrics/')
     os.makedirs(metrics_path, exist_ok=True)
-    plt.savefig('{}/confusion_roc_auc.png'.format(metrics_path))
+    plt.savefig('{}/confusion_roc_auc.png'.format(metrics_path), dpi=2000)
     
           
-    dic_metrics = classification_report(y_true=y_true, 
-                                        y_pred=y_pred, 
-                                        output_dict=True)
+    # dic_metrics = classification_report(y_true=y_true, 
+    #                                     y_pred=y_pred, 
+    #                                     output_dict=True)
+    
+    
+    report_dict = {
+        "metrics": {
+            "accuracy": {
+                "value": accuracy,
+            },
+            
+            "f1_score": {
+                "value": f1,
+            },
+        },
+    }
           
     evaluation_path = '{}/evaluation.json'.format(metrics_path)
     with open(evaluation_path, 'w') as f:
-          f.write(json.dumps(dic_metrics))
+          f.write(json.dumps(report_dict))
       
           
     print('Listing content of output dir: {}'.format(args.output_data))
