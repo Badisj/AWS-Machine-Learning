@@ -31,39 +31,6 @@ from pathlib import Path
 
 #########################################################################
 ############ low-level service client of the boto3 session  #############
-
-# config = botocore.config.Config()
-
-# sm = boto3.client(service_name='sagemaker', 
-#                   config=config)
-
-# sm_runtime = boto3.client('sagemaker-runtime',
-#                           config=config)
-
-# sess = sagemaker.Session(sagemaker_client=sm,
-#                          sagemaker_runtime_client=sm_runtime)
-
-# bucket = sess.default_bucket()
-# role = sagemaker.get_execution_role()
-# region = sess.boto_region_name
-
-# region = os.environ['AWS_DEFAULT_REGION']
-# sts = boto3.Session(region_name=region).client(service_name='sts', region_name=region)
-# iam = boto3.Session(region_name=region).client(service_name='iam', region_name=region)
-# featurestore_runtime = boto3.Session(region_name=region).client(service_name='sagemaker-featurestore-runtime', region_name=region)
-# sm = boto3.Session(region_name=region).client(service_name='sagemaker', region_name=region)
-
-# caller_identity = sts.get_caller_identity()
-# assumed_role_arn = caller_identity['Arn']
-# assumed_role_name = assumed_role_arn.split('/')[-2]
-# get_role_response = iam.get_role(RoleName=assumed_role_name) 
-# role = get_role_response['Role']['Arn']
-# bucket = sagemaker.Session().default_bucket()
-
-# sagemaker_session = sagemaker.Session(boto_session=boto3.Session(region_name=region), 
-#                             sagemaker_client=sm,
-#                             sagemaker_featurestore_runtime_client=featurestore_runtime)
-
 config = botocore.config.Config(user_agent_extra='bedissj-1699438736259')
 
 
