@@ -115,16 +115,14 @@ def model_training(df_train, df_val, n_estimators, max_depth, criterion, random_
     
     # ================== Retrieve features & targets ================
     print('Retrieving features and targets.')
-    train_label = df_train.columns[0]
     
-    X_train = df_train.drop(columns=[train_label]).copy()
-    y_train = df_train[train_label].copy()
+    X_train = df_train.drop(columns=[df_train.columns[0]]).copy()
+    y_train = df_train[df_train.columns[0]].copy()
     print('Training data shape:', X_train.shape)
     print('Training target shape:', y_train.shape)
 
-    
-    X_val = df_val.drop(columns=[train_label]).copy()
-    y_val = df_val[train_label].copy()
+    X_val = df_val.drop(columns=[df_val.columns[0]]).copy()
+    y_val = df_val[df_val.columns[0]].copy()
     print('Validation data shape:', X_val.shape)
     print('Validation target shape:', y_val.shape)
     
