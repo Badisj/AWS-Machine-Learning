@@ -30,10 +30,10 @@ def model_fn(model_dir):
 
 
 def predict_fn(input_data, model):
-    preds = pd.Series(model.predict(input_data), name='PredictedLabel')
-    preds_proba = pd.DataFrame(model.predict_proba(input_data), columns = ['ProbClass0', 'ProbClass1'])
+    preds = model.predict(input_data)
+    preds_proba = model.predict_proba(input_data)
     
-    preds_df = pd.concat((preds, preds_proba), axis=1)
-    return preds_df.values
+    # preds_df = pd.concat((preds, preds_proba), axis=1)
+    return np.array([preds, preds_proba])
 
 
