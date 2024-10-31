@@ -12,6 +12,7 @@ model_name = 'churn_random_forest.joblib'
 
 
 
+
 def model_fn(model_dir):
     # print('Extracting model.tar.gz')
     # model_tar_path = '{}/{}'.format(model_dir, model_name_tar_gz)
@@ -32,8 +33,8 @@ def model_fn(model_dir):
 def predict_fn(input_data, model):
     preds = model.predict(input_data)
     preds_proba = model.predict_proba(input_data)
-    
-    # preds_df = pd.concat((preds, preds_proba), axis=1)
-    return np.array([preds, preds_proba])
+    preds_df = np.concatenate((preds, preds_proba), axis=1)
+
+    return preds_df
 
 
